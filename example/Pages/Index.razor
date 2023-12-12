@@ -1,0 +1,93 @@
+﻿@page "/"
+@inject IJSRuntime JSRuntime
+@using RazorCameraLibrary
+<PageTitle>Index</PageTitle>
+
+<div>
+    <button @onclick="GetCameras">Get Cameras</button>
+    <select id="sources" @onchange="e => OnChange(e)">
+        @foreach (var camera in cameras)
+        {
+            <option value="@camera.DeviceId">@camera.Label</option>
+        }
+    </select>
+    <button @onclick="Capture">Capture</button>
+</div>
+
+<div id="videoview">
+    <div id="videoContainer"></div>
+</div>
+
+@code {
+    private List<Camera> cameras = new List<Camera>();
+    private CameraJsInterop? cameraJsInterop;
+    private CameraEnhancer? cameraEnhancer;
+
+    public string selectedValue = string.Empty;
+
+    private async Task OnChange(ChangeEventArgs e)
+    {
+        if (cameraEnhancer != null)
+        {
+            await cameraEnhancer.CloseCamera();
+
+            selectedValue = e.Value.ToString();
+
+            await OpenCamera();
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        cameraJsInterop = new CameraJsInterop(JSRuntime);
+        await cameraJsInterop.LoadJS();
+
+        cameraEnhancer = await cameraJsInterop.CreateCameraEnhancer();
+        await cameraEnhancer.SetVideoElement("videoContainer");
+    }
+
+    public async Task GetCameras()
+    {
+        if (cameraEnhancer == null) return;
+        try
+        {
+            cameras = await cameraEnhancer.GetCameras();
+            if (cameras.Count >= 0)
+            {
+                selectedValue = cameras[0].DeviceId;
+                await OpenCamera();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    public async Task OpenCamera()
+    {
+        if (cameraEnhancer == null) return;
+        try
+        {
+            int selectedIndex = cameras.FindIndex(camera => camera.DeviceId == selectedValue);
+            await cameraEnhancer.OpenCamera(cameras[selectedIndex]);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+
+    public async Task Capture()
+    {
+        if (cameraEnhancer == null) return;
+        try
+        {
+            await cameraEnhancer.AcquireCameraFrame();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
+    }
+}
