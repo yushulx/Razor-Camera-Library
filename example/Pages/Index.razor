@@ -1,29 +1,38 @@
 ﻿@page "/"
 @inject IJSRuntime JSRuntime
 @using RazorCameraLibrary
+@using RazorBarcodeLibrary
+@using Camera = RazorCameraLibrary.Camera
+
 <PageTitle>Index</PageTitle>
 
-<div>
-    <button @onclick="GetCameras">Get Cameras</button>
-    <select id="sources" @onchange="e => OnChange(e)">
-        @foreach (var camera in cameras)
-        {
-            <option value="@camera.DeviceId">@camera.Label</option>
-        }
-    </select>
-    <button @onclick="Capture">Capture</button>
-</div>
+<div class="container">
+    <div>
+        <button @onclick="GetCameras">Get Cameras</button>
+        <select id="sources" @onchange="e => OnChange(e)">
+            @foreach (var camera in cameras)
+            {
+                <option value="@camera.DeviceId">@camera.Label</option>
+            }
+        </select>
+        <button @onclick="Capture">@buttonText</button>
+    </div>
 
-<div id="videoview">
-    <div id="videoContainer"></div>
+    <div id="videoview">
+        <div id="videoContainer"></div>
+        <canvas id="overlay" class="overlay"></canvas>
+    </div>
 </div>
 
 @code {
     private List<Camera> cameras = new List<Camera>();
     private CameraJsInterop? cameraJsInterop;
     private CameraEnhancer? cameraEnhancer;
-
-    public string selectedValue = string.Empty;
+    private BarcodeReader? reader;
+    private BarcodeJsInterop? barcodeJsInterop;
+    private string selectedValue = string.Empty;
+    private bool _isCapturing = false;
+    private string buttonText = "Start";
 
     private async Task OnChange(ChangeEventArgs e)
     {
@@ -39,6 +48,11 @@
 
     protected override async Task OnInitializedAsync()
     {
+        barcodeJsInterop = new BarcodeJsInterop(JSRuntime);
+        await barcodeJsInterop.LoadJS();
+
+        reader = await barcodeJsInterop.CreateBarcodeReader();
+
         cameraJsInterop = new CameraJsInterop(JSRuntime);
         await cameraJsInterop.LoadJS();
 
@@ -72,7 +86,7 @@
             int selectedIndex = cameras.FindIndex(camera => camera.DeviceId == selectedValue);
             await cameraEnhancer.SetResolution(640, 480);
             await cameraEnhancer.OpenCamera(cameras[selectedIndex]);
-            
+
         }
         catch (Exception ex)
         {
@@ -80,16 +94,45 @@
         }
     }
 
-    public async Task Capture()
+    public void Capture()
     {
         if (cameraEnhancer == null) return;
-        try
+
+        if (!_isCapturing)
         {
-            await cameraEnhancer.AcquireCameraFrame();
+            buttonText = "Stop";
+            _isCapturing = true;
+            _ = WorkLoop();
         }
-        catch (Exception ex)
+        else
         {
-            Console.WriteLine(ex.Message);
+            buttonText = "Start";
+            _isCapturing = false;
         }
+    }
+
+    private async Task WorkLoop()
+    {
+        List<BarcodeResult> results = new List<BarcodeResult>();
+        if (barcodeJsInterop == null || cameraEnhancer == null || reader == null) return;
+
+        while (_isCapturing)
+        {
+            try
+            {
+                IJSObjectReference canvas = await cameraEnhancer.AcquireCameraFrame();
+                results = await reader.DecodeCanvas(canvas);
+                await barcodeJsInterop.DrawCanvas("overlay", reader.SourceWidth, reader.SourceHeight, results);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            // await InvokeAsync(StateHasChanged);
+        }
+
+        results.Clear();
+        await barcodeJsInterop.DrawCanvas("overlay", reader.SourceWidth, reader.SourceHeight, results);
     }
 }
