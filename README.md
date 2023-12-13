@@ -31,7 +31,6 @@ A Razor Class Library built using the [Dynamsoft JavaScript Camera Enhancer SDK]
 - Get a list of available cameras.
 
     ```csharp
-    
     List<Camera> cameras = await cameraEnhancer.GetCameras();
     ```
 - Set the camera resolution.
