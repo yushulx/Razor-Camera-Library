@@ -85,6 +85,7 @@ namespace RazorCameraLibrary
         /// <returns>A list of available Camera objects.</returns>
         public async Task<List<Camera>> GetCameras()
         {
+            _cameras.Clear();
             JsonElement? result = await _module.InvokeAsync<JsonElement>("getCameras", _jsObjectReference);
 
             if (result != null)
