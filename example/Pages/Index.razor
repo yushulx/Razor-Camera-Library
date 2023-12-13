@@ -48,11 +48,6 @@
 
     protected override async Task OnInitializedAsync()
     {
-        barcodeJsInterop = new BarcodeJsInterop(JSRuntime);
-        await barcodeJsInterop.LoadJS();
-
-        reader = await barcodeJsInterop.CreateBarcodeReader();
-
         cameraJsInterop = new CameraJsInterop(JSRuntime);
         await cameraJsInterop.LoadJS();
 
@@ -94,8 +89,16 @@
         }
     }
 
-    public void Capture()
+    public async Task Capture()
     {
+        if (barcodeJsInterop == null || reader == null)
+        {
+            barcodeJsInterop = new BarcodeJsInterop(JSRuntime);
+            await barcodeJsInterop.LoadJS();
+
+            reader = await barcodeJsInterop.CreateBarcodeReader();
+        }
+
         if (cameraEnhancer == null) return;
 
         if (!_isCapturing)
