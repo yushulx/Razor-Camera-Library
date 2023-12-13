@@ -6,6 +6,10 @@
 
 <PageTitle>Index</PageTitle>
 
+<div id="loading-indicator" class="loading-indicator" style="@(isLoading ? "display: flex;" : "display: none;")">
+    <div class="spinner"></div>
+</div>
+
 <div class="container">
     <div>
         <button @onclick="GetCameras">Get Cameras</button>
@@ -25,6 +29,7 @@
 </div>
 
 @code {
+    private bool isLoading = false;
     private List<Camera> cameras = new List<Camera>();
     private CameraJsInterop? cameraJsInterop;
     private CameraEnhancer? cameraEnhancer;
@@ -93,10 +98,12 @@
     {
         if (barcodeJsInterop == null || reader == null)
         {
+            isLoading = true;
             barcodeJsInterop = new BarcodeJsInterop(JSRuntime);
             await barcodeJsInterop.LoadJS();
 
             reader = await barcodeJsInterop.CreateBarcodeReader();
+            isLoading = false;
         }
 
         if (cameraEnhancer == null) return;
