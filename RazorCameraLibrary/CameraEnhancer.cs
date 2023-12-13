@@ -63,7 +63,7 @@ namespace RazorCameraLibrary
         }
 
         /// <summary>
-        /// Opens the camera.
+        /// Opens a camera.
         /// </summary>
         /// <param name="camera">The camera to be opened.</param>
         public async Task OpenCamera(Camera camera)
@@ -131,13 +131,23 @@ namespace RazorCameraLibrary
         }
 
         /// <summary>
-        /// Creates a new CameraEnhancer instance.
+        /// Acquires a frame from the camera.
         /// </summary>
-        /// <returns>A task that represents the asynchronous operation. The task result is a new CameraEnhancer instance.</returns>
+        /// <returns> A JavaScript canvas object reference.</returns>
         public async Task<IJSObjectReference> AcquireCameraFrame()
         {
             IJSObjectReference jsObjectReference = await _module.InvokeAsync<IJSObjectReference>("acquireCameraFrame", _jsObjectReference);
             return jsObjectReference;
+        }
+
+        /// <summary>
+        /// Sets the resolution of the camera.
+        /// </summary>
+        /// <param name="width">The width of the camera.</param>
+        /// <param name="height">The height of the camera.</param>
+        public async Task SetResolution(int width, int height)
+        {
+            await _module.InvokeVoidAsync("setResolution", _jsObjectReference, width, height);
         }
     }
 }

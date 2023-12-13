@@ -42,10 +42,10 @@ export async function openCamera(cameraEnhancer, cameraInfo, dotNetHelper, callb
 
     try {
         await cameraEnhancer.selectCamera(cameraInfo);
-        cameraEnhancer.onPlayed = function () {
+        cameraEnhancer.on("played", function () {
             let resolution = cameraEnhancer.getResolution();
             dotNetHelper.invokeMethodAsync(callback, resolution[0], resolution[1]);
-        }
+        });
         await cameraEnhancer.open();
     }
     catch (ex) {
@@ -83,6 +83,17 @@ export function acquireCameraFrame(cameraEnhancer) {
     try {
         let img = cameraEnhancer.getFrame().toCanvas();
         return img;
+    }
+    catch (ex) {
+        console.error(ex);
+    }
+}
+
+export async function setResolution(cameraEnhancer, width, height) {
+    if (!Dynamsoft) return;
+
+    try {
+        await cameraEnhancer.setResolution(width, height);
     }
     catch (ex) {
         console.error(ex);

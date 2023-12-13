@@ -70,7 +70,9 @@
         try
         {
             int selectedIndex = cameras.FindIndex(camera => camera.DeviceId == selectedValue);
+            await cameraEnhancer.SetResolution(640, 480);
             await cameraEnhancer.OpenCamera(cameras[selectedIndex]);
+            
         }
         catch (Exception ex)
         {
