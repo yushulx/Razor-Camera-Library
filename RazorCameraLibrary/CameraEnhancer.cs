@@ -150,5 +150,36 @@ namespace RazorCameraLibrary
         {
             await _module.InvokeVoidAsync("setResolution", _jsObjectReference, width, height);
         }
+
+        /// <summary>
+        /// Clears the camera overlay.
+        /// </summary>
+        public async Task ClearOverlay()
+        {
+            await _module.InvokeVoidAsync("clearOverlay", _jsObjectReference);
+        }
+
+        /// <summary>
+        /// Draws a line on the camera overlay.
+        /// </summary>
+        /// <param name="x1">The x-coordinate of the first point.</param>
+        /// <param name="y1">The y-coordinate of the first point.</param>
+        /// <param name="x2">The x-coordinate of the second point.</param>
+        /// <param name="y2">The y-coordinate of the second point.</param>
+        public async Task DrawLine(int x1, int y1, int x2, int y2)
+        {
+            await _module.InvokeVoidAsync("drawLine", _jsObjectReference, x1, y1, x2, y2);
+        }
+
+        /// <summary>
+        /// Draws text on the camera overlay.
+        /// </summary>
+        /// <param name="text">The text to be drawn.</param>
+        /// <param name="x">The x-coordinate of the text.</param>
+        /// <param name="y">The y-coordinate of the text.</param>
+        public async Task DrawText(string text, int x, int y)
+        {
+            await _module.InvokeVoidAsync("drawText", _jsObjectReference, text, x, y);
+        }
     }
 }

@@ -48,6 +48,18 @@ A Razor Class Library built using the [Dynamsoft JavaScript Camera Enhancer SDK]
     ```csharp
     IJSObjectReference canvas = await cameraEnhancer.AcquireCameraFrame();
     ```
+- Draw shapes on the camera overlay.
+
+    ```csharp
+    await cameraEnhancer.DrawLine(0, 0, 100, 100);
+    await cameraEnhancer.DrawText("Hello World", 0, 0);
+    ```
+- Clear the camera overlay.
+
+    ```csharp
+    await cameraEnhancer.ClearOverlay();
+    ```
+
 ## API
 
 ### Camera Class
@@ -65,12 +77,14 @@ Represents a camera device with its device ID and label.
 - `Task CloseCamera()`: Closes the current camera.
 - `Task SetResolution(int width, int height)`: Sets the resolution of the camera.
 - `Task<IJSObjectReference> AcquireCameraFrame()`: Acquires a frame from the camera and returns a JavaScript canvas object reference.
-
+- `Task DrawLine(int x1, int y1, int x2, int y2)`: Draws a line on the camera overlay.
+- `Task DrawText(string text, int x, int y)`: Draws text on the camera overlay.
+- `Task ClearOverlay()`: Clears the camera overlay.
 
 ## Example
 - [Blazor Barcode Scanner](https://github.com/yushulx/Razor-Camera-Library/tree/main/example)
     
-    ![Blazor qrcode scanner](https://www.dynamsoft.com/codepool/img/2023/12/razor-camera-library-blazor-qr-scanner.png)
+    ![Blazor qrcode scanner](https://camo.githubusercontent.com/08a4f5c8b8ebfe043e96180897a684446e115a8338d297f4553d450b091c548a/68747470733a2f2f7777772e64796e616d736f66742e636f6d2f636f6465706f6f6c2f696d672f323032332f31322f72617a6f722d63616d6572612d6c6962726172792d626c617a6f722d71722d7363616e6e65722e706e67)
 
 ## Build 
 

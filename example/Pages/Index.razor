@@ -24,7 +24,7 @@
 
     <div id="videoview">
         <div id="videoContainer"></div>
-        <canvas id="overlay" class="overlay"></canvas>
+        @* <canvas id="overlay" class="overlay"></canvas> *@
     </div>
 </div>
 
@@ -132,7 +132,27 @@
             {
                 IJSObjectReference canvas = await cameraEnhancer.AcquireCameraFrame();
                 results = await reader.DecodeCanvas(canvas);
-                await barcodeJsInterop.DrawCanvas("overlay", reader.SourceWidth, reader.SourceHeight, results);
+                await cameraEnhancer.ClearOverlay();
+                for (int i = 0; i < results.Count; i++)
+                {
+                    BarcodeResult result = results[i];
+                    int minX = result.X1;
+                    int minY = result.Y1;
+
+                    await cameraEnhancer.DrawLine(result.X1, result.Y1, result.X2, result.Y2);
+                    minX = minX < result.X2 ? minX : result.X2;
+                    minY = minY < result.Y2 ? minY : result.Y2;
+                    await cameraEnhancer.DrawLine(result.X2, result.Y2, result.X3, result.Y3);
+                    minX = minX < result.X3 ? minX : result.X3;
+                    minY = minY < result.Y3 ? minY : result.Y3;
+                    await cameraEnhancer.DrawLine(result.X3, result.Y3, result.X4, result.Y4);
+                    minX = minX < result.X4 ? minX : result.X4;
+                    minY = minY < result.Y4 ? minY : result.Y4;
+                    await cameraEnhancer.DrawLine(result.X4, result.Y4, result.X1, result.Y1);
+
+                    await cameraEnhancer.DrawText(result.Text, minX, minY);
+                }
+                // await barcodeJsInterop.DrawCanvas("overlay", reader.SourceWidth, reader.SourceHeight, results);
             }
             catch (Exception ex)
             {
@@ -142,7 +162,7 @@
             // await InvokeAsync(StateHasChanged);
         }
 
-        results.Clear();
-        await barcodeJsInterop.DrawCanvas("overlay", reader.SourceWidth, reader.SourceHeight, results);
+        await cameraEnhancer.ClearOverlay();
+        // await barcodeJsInterop.DrawCanvas("overlay", reader.SourceWidth, reader.SourceHeight, results);
     }
 }
