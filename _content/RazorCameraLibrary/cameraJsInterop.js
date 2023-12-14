@@ -99,3 +99,70 @@ export async function setResolution(cameraEnhancer, width, height) {
         console.error(ex);
     }
 }
+
+export function clearOverlay(cameraEnhancer) {
+    if (!Dynamsoft) return;
+
+    try {
+        let drawingLayers = cameraEnhancer.getDrawingLayers();
+        if (drawingLayers.length > 0) {
+            drawingLayers[0].clearDrawingItems();
+        }
+        else {
+            cameraEnhancer.createDrawingLayer();
+        }
+    }
+    catch (ex) {
+        console.error(ex);
+    }
+}
+
+export function drawLine(cameraEnhancer, x1, y1, x2, y2) {
+    if (!Dynamsoft) return;
+
+    try {
+        let drawingLayers = cameraEnhancer.getDrawingLayers();
+        let drawingLayer;
+        let drawingItems = new Array(
+            new Dynamsoft.DCE.DrawingItem.DT_Line({
+                x: x1,
+                y: y1
+            }, {
+                x: x2,
+                y: y2
+            }, 1)
+        )
+        if (drawingLayers.length > 0) {
+            drawingLayer = drawingLayers[0];
+        }
+        else {
+            drawingLayer = cameraEnhancer.createDrawingLayer();
+        }
+        drawingLayer.addDrawingItems(drawingItems);
+    }
+    catch (ex) {
+        console.error(ex);
+    }
+}
+
+export function drawText(cameraEnhancer, text, x, y) {
+    if (!Dynamsoft) return;
+
+    try {
+        let drawingLayers = cameraEnhancer.getDrawingLayers();
+        let drawingLayer;
+        let drawingItems = new Array(
+            new Dynamsoft.DCE.DrawingItem.DT_Text(text, x, y, 1),
+        )
+        if (drawingLayers.length > 0) {
+            drawingLayer = drawingLayers[0];
+        }
+        else {
+            drawingLayer = cameraEnhancer.createDrawingLayer();
+        }
+        drawingLayer.addDrawingItems(drawingItems);
+    }
+    catch (ex) {
+        console.error(ex);
+    }
+}
