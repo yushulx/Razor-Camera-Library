@@ -70,7 +70,7 @@ Represents a camera device with its device ID and label.
 ## Example
 - [Blazor Barcode Scanner](https://github.com/yushulx/Razor-Camera-Library/tree/main/example)
     
-    ![Blazor qrcode scanner](https://github.com/yushulx/Razor-Camera-Library/assets/2202306/a0ce82c6-5456-4509-9dad-cc5f9cd77c3b)
+    ![Blazor qrcode scanner](https://www.dynamsoft.com/codepool/img/2023/12/razor-camera-library-blazor-qr-scanner.png)
 
 ## Build 
 
